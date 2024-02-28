@@ -23,6 +23,15 @@ class HerbsController < ApplicationController
     end
   end
 
+  def destroy
+    herb = Herb.find(params[:id])
+    if herb.destroy
+      render json: herb
+    else
+      render json: herb.errors, status: 422
+    end
+  end
+
   private
   def herb_params
     params.require(:herb).permit(:name, :scientific_name, :summary, :benefit, :warning, :image, :user_id)
