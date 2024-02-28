@@ -238,4 +238,23 @@ RSpec.describe "Herbs", type: :request do
       expect(response).to have_http_status(422)
     end
   end
+
+  describe 'DELETE #destroy' do
+    it 'deletes a herb' do
+      herb = Herb.create(
+        name: "Blue Lotus Root",
+          scientific_name: "Nymphaea caerulea",
+          summary: "Also known as the Sacred Blue Lily, it's benefits have laid claims for thousands of years as a sleep aid, aphrodisiac and much more while it boasts having psychoactive properties.",
+          benefit: "Improves Sleep, Eases Anxiety and Aphrodisiac",
+          warning: "Psychoactive properties should not be mixes with other substances",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Lotus_india_cropped.jpg/1200px-Lotus_india_cropped.jpg",
+          user_id: user.id
+      )
+
+      delete "/herbs/#{herb.id}"
+
+      expect(response).to have_http_status(200)
+      expect(Herb.find_by(id: herb.id)).to be_nil
+    end
+  end
 end
