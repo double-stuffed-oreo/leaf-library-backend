@@ -165,4 +165,77 @@ RSpec.describe "Herbs", type: :request do
     json = JSON.parse(response.body)
     expect(json['user_id']).to include "can't be blank"
   end  
+
+  describe "PATCH /update" do
+    it "updates a herb" do
+      herb_params = {
+        herb: {
+          name: "Blue Lotus Root",
+          scientific_name: "Nymphaea caerulea",
+          summary: "Also known as the Sacred Blue Lily, it's benefits have laid claims for thousands of years as a sleep aid, aphrodisiac and much more while it boasts having psychoactive properties.",
+          benefit: "Improves Sleep, Eases Anxiety and Aphrodisiac",
+          warning: "Psychoactive properties should not be mixes with other substances",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Lotus_india_cropped.jpg/1200px-Lotus_india_cropped.jpg",
+          user_id: user.id
+        }
+      }
+      post '/herbs', params: herb_params
+  
+      updated_herb_params = {
+        herb: {
+          name: "Sea Moss",
+          scientific_name: "Chondrus crispus",
+          summary: "Sea moss is about 80% water and contains small amounts of protein and carbohydrates. It's also a source of carrageenan, a natural food thickening agent.",
+          benefit: "Improving the immune system, slowing down digestion, balancing blood sugar levels, supporting a healthy heart",
+          warning: "Some people have reported feeling tired and sleepy after taking sea moss. Raw sea moss can also have an earthy, ocean-like taste, not unlike an oyster or a clam.",
+          image: "https://wildling.com/cdn/shop/articles/Irish_Sea_Moss.webp?v=1694632157&width=750"
+        }
+      }
+      herb = Herb.first
+      
+      patch "/herbs/#{herb.id}", params: updated_herb_params
+
+      expect(response).to have_http_status(200)
+  
+      updated_herb = Herb.first
+      
+      expect(updated_herb.name).to eq('Sea Moss')
+      expect(updated_herb.scientific_name).to eq('Chondrus crispus')
+      expect(updated_herb.summary).to eq("Sea moss is about 80% water and contains small amounts of protein and carbohydrates. It's also a source of carrageenan, a natural food thickening agent.")
+      expect(updated_herb.benefit).to eq("Improving the immune system, slowing down digestion, balancing blood sugar levels, supporting a healthy heart")
+      expect(updated_herb.warning).to eq("Some people have reported feeling tired and sleepy after taking sea moss. Raw sea moss can also have an earthy, ocean-like taste, not unlike an oyster or a clam.")
+      expect(updated_herb.image).to eq("https://wildling.com/cdn/shop/articles/Irish_Sea_Moss.webp?v=1694632157&width=750")
+    end
+
+    it 'returns a 422 status code' do
+      herb_params = {
+        herb: {
+          name: "Blue Lotus Root",
+          scientific_name: "Nymphaea caerulea",
+          summary: "Also known as the Sacred Blue Lily, it's benefits have laid claims for thousands of years as a sleep aid, aphrodisiac and much more while it boasts having psychoactive properties.",
+          benefit: "Improves Sleep, Eases Anxiety and Aphrodisiac",
+          warning: "Psychoactive properties should not be mixes with other substances",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Lotus_india_cropped.jpg/1200px-Lotus_india_cropped.jpg",
+          user_id: user.id
+        }
+      }
+      post '/herbs', params: herb_params
+
+      invalid_herb_params = {
+        herb: {
+          name: nil,
+          scientific_name: nil,
+          summary: nil,
+          benefit: nil,
+          warning: nil,
+          image: nil
+        }
+      }
+
+      herb = Herb.first
+      patch "/herbs/#{herb.id}", params: invalid_herb_params
+
+      expect(response).to have_http_status(422)
+    end
+  end
 end
